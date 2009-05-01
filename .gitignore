@@ -18,3 +18,4 @@ public/attachments
 *.log
 coverage.data
 coverage/*
+nbproject/*
