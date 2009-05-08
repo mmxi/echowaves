@@ -26,7 +26,7 @@ class ConversationsController < ApplicationController
   end
 
   def show
-    @messages = @conversation.messages.published.find(:all, :include => [:user], :limit => 100, :order => 'id DESC').reverse
+    @messages = @conversation.messages.published.find(:all, :include => [:user], :limit => 50, :order => 'id DESC').reverse
     
     if logged_in?
       subscription = current_user.subscriptions.find_by_conversation_id(@conversation.id)
@@ -43,7 +43,7 @@ class ConversationsController < ApplicationController
   end
 
   def files
-    @messages = @conversation.messages.with_file.published.find(:all, :include => [:user], :limit => 100, :order => 'id DESC').reverse
+    @messages = @conversation.messages.with_file.published.find(:all, :include => [:user], :limit => 50, :order => 'id DESC').reverse
     
     if logged_in?
       subscription = current_user.subscriptions.find_by_conversation_id(@conversation.id)
@@ -60,7 +60,7 @@ class ConversationsController < ApplicationController
   end
   
   def images
-    @messages = @conversation.messages.with_image.published.find(:all, :include => [:user], :limit => 100, :order => 'id DESC').reverse
+    @messages = @conversation.messages.with_image.published.find(:all, :include => [:user], :limit => 50, :order => 'id DESC').reverse
     
     if logged_in?
       subscription = current_user.subscriptions.find_by_conversation_id(@conversation.id)
@@ -117,7 +117,7 @@ class ConversationsController < ApplicationController
           # create a message in the original conversation notifying about this spawning
           # and send realtime notification to everyone who's listening
           notification_message = @conversation.notify_of_new_spawn( current_user )
-          notification_message.send_stomp_message(self) unless notification_message == nil
+          notification_message.send_stomp_message unless notification_message == nil
           # copy the original message in the recient create convo
           @copied_message = @conversation.parent_message.clone
           @copied_message.conversation = @conversation
@@ -139,7 +139,7 @@ class ConversationsController < ApplicationController
             notification = current_user.messages.create( :conversation => personal_convo, :message => msg)
             notification.system_message = true
             notification.save
-            notification.send_stomp_message(self)
+            notification.send_stomp_message
           end
         end
         
@@ -260,7 +260,7 @@ class ConversationsController < ApplicationController
       notification = current_user.messages.create( :conversation => @user.personal_conversation, :message => msg)
       notification.system_message = true
       notification.save
-      notification.send_stomp_message(self)
+      notification.send_stomp_message
     end
     
     render :update do |page| 
